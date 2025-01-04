@@ -65,13 +65,10 @@ public class ApiV1PostController {
 
     // 수정
     public record PostModifyBody (
-            @NotBlank (message = "제목을 입력하세요")
-            @Length (min = 2, message = "2자이상 입력하세요")
-            String title,
-
-            @NotBlank (message = "내용을 입력하세요")
-            @Length (min = 2, message = "2자이상 입력하세요")
-            String content
+            @NotBlank @Length (min = 2) String title,
+            @NotBlank @Length (min = 2) String content,
+            @NotNull Long authorId,
+            @NotBlank @Length (min = 4) String password
     ) {
     }
 
@@ -81,6 +78,11 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyBody reqBody
     ) {
+        Member actor = memberService.findById(reqBody.authorId).get();
+
+        if  (!actor.getPassword().equals(reqBody.password))
+            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+
         Post post = postService.findById(id).get();
 
         postService.modify(post, reqBody.title(), reqBody.content());
@@ -107,8 +109,8 @@ public class ApiV1PostController {
     ) {
         Member actor = memberService.findById(reqBody.authorId).get();
 
-        //인즈 체크
-        if (actor.getPassword().equals(reqBody.password))
+        // 인증 체크
+        if (!actor.getPassword().equals(reqBody.password))
             throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
