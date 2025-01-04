@@ -32,13 +32,6 @@ public class ApiV1PostController {
                 .stream()
                 .map(PostDto::new)
                 .toList();
-
-/*      List<Post> posts = postService.findAllByOrderByIdDesc();
-        List<PostDto> postDtos = new ArrayList<>();
-        for (Post post : posts) {
-            postDtos.add(new PostDto(post));
-        }
-        return postDtos;*/// List 사용 시
     }
 
     // 단건 조회
@@ -46,14 +39,27 @@ public class ApiV1PostController {
     public PostDto getItem(@PathVariable long id) {
         return postService.findById(id)
                 .map(PostDto::new)
-                // .map (post -> new PostDto(post))
                 .orElseThrow();
     }
 
     // 삭제
     @DeleteMapping("/{id}")
-    public RsData<Void> deleteItem(@PathVariable long id) {
+    public RsData<Void> deleteItem(
+            @PathVariable long id,
+            @RequestHeader("actorId") long actorId,
+            @RequestHeader("actorPassword") String actorPassword
+    ) {
+        Member actor = memberService.findById(actorId).get();
+
+        // 401 : 읽는 과정에서 인증 실패
+        if  (!actor.getPassword().equals(actorPassword))
+            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+
         Post post = postService.findById(id).get();
+
+        // 403 : 권한 부여의 실패
+        if  (!post.getAuthor().equals(actor))
+            throw new ServiceException("403-1" ,"작성자만 글을 삭제할 권한이 있습니다.");
 
         postService.delete(post);
 
