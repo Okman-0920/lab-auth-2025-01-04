@@ -80,10 +80,15 @@ public class ApiV1PostController {
     ) {
         Member actor = memberService.findById(reqBody.authorId).get();
 
+        // 401 : 읽는 과정에서 인증 실패
         if  (!actor.getPassword().equals(reqBody.password))
             throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
 
         Post post = postService.findById(id).get();
+
+        // 403 : 권한 부여의 실패
+        if  (!post.getAuthor().equals(actor))
+            throw new ServiceException("403-1" ,"작성자만 글을 수정할 권한이 있습니다.");
 
         postService.modify(post, reqBody.title(), reqBody.content());
 
