@@ -116,7 +116,7 @@ public class ApiV1PostController {
     public RsData<PostWriteResBody> writeItem(
             @RequestBody @Valid PostWriteBody reqBody
     ) {
-        Member actor = memberService.findByUsername("user3").get();
+        Member actor = memberService.findById(reqBody.authorId).get();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
