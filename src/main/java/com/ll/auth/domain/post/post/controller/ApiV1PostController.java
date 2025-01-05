@@ -24,8 +24,6 @@ public class ApiV1PostController {
     private final MemberService memberService;
 
     public Member checkAuthentication(String credentials) {
-        credentials = credentials.substring("Bearer ".length());
-        // if (cmd.equals.("삭제?id=") 생각하면 쉬움
         String[] credentialsBits = credentials.split("/",2);
         long actorId = Long.parseLong(credentialsBits[0]);
         String actorPassword = credentialsBits[1];
