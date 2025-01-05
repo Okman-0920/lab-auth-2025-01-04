@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -28,18 +29,14 @@ public class ApiV1PostController {
 
     public Member checkAuthentication() {
         String credentials = request.getHeader("Authorization");
-        credentials = credentials.substring("Bearer ".length());
-        String[] credentialsBits = credentials.split("/",2);
-        long actorId = Long.parseLong(credentialsBits[0]);
-        String actorPassword = credentialsBits[1];
+        String apiKey = credentials.substring("Bearer ".length());
 
-        Member actor = memberService.findById(actorId).get();
+        Optional<Member> opActor = memberService.findByApiKey(apiKey);
 
-        // 401 : 읽는 과정에서 인증 실패
-        if  (!actor.getPassword2().equals(actorPassword))
-            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+        if (opActor.isEmpty())
+            throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
 
-        return actor;
+        return opActor.get();
     }
 
     // 단건 조회
