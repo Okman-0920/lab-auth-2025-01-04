@@ -37,6 +37,14 @@ public class ApiV1PostController {
         return actor;
     }
 
+    // 단건 조회
+    @GetMapping("/{id}")
+    public PostDto getItem(@PathVariable long id) {
+        return postService.findById(id)
+                .map(PostDto::new)
+                .orElseThrow();
+    }
+
     // 다건 조회
     @GetMapping
     public List<PostDto> getItems() {
@@ -47,20 +55,12 @@ public class ApiV1PostController {
                 .toList();
     }
 
-    // 단건 조회
-    @GetMapping("/{id}")
-    public PostDto getItem(@PathVariable long id) {
-        return postService.findById(id)
-                .map(PostDto::new)
-                .orElseThrow();
-    }
-
     // 삭제
     @DeleteMapping("/{id}")
     public RsData<Void> deleteItem(
             @PathVariable long id,
             // URL 경로에서 id 값을 가져오는것
-            @RequestHeader String credentials
+            @RequestHeader("Authorization") String credentials
     ) {
         Member actor = checkAuthentication(credentials);
 
@@ -91,7 +91,7 @@ public class ApiV1PostController {
     public RsData<PostDto> modifyItem(
             @PathVariable long id,
             @RequestBody @Valid PostModifyBody reqBody,
-            @RequestHeader String credentials
+            @RequestHeader("Authorization") String credentials
     ) {
         Member actor = checkAuthentication(credentials);
 
@@ -120,7 +120,7 @@ public class ApiV1PostController {
     @PostMapping
     public RsData<PostDto> writeItem(
             @RequestBody @Valid PostWriteBody reqBody,
-            @RequestHeader String credentials
+            @RequestHeader("Authorization") String credentials
     ) {
         Member actor = checkAuthentication(credentials);
 
