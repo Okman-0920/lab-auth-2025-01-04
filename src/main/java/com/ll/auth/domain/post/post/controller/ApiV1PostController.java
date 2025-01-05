@@ -6,8 +6,8 @@ import com.ll.auth.domain.post.post.dto.PostDto;
 import com.ll.auth.domain.post.post.entity.Post;
 import com.ll.auth.domain.post.post.service.PostService;
 import com.ll.auth.global.exceptions.ServiceException;
+import com.ll.auth.global.rq.Rq;
 import com.ll.auth.global.rsData.RsData;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -24,20 +23,8 @@ import java.util.Optional;
 public class ApiV1PostController {
     private final PostService postService; // in Singleton Bean
     private final MemberService memberService; // in Singleton Bean
-    private final HttpServletRequest request; // in Singleton Bean
-    // @Controller 관련 어노테이션이 설정된 클래스에서 생성된 모든 인스턴스 대상
+    private final Rq rq;
 
-    public Member checkAuthentication() {
-        String credentials = request.getHeader("Authorization");
-        String apiKey = credentials.substring("Bearer ".length());
-
-        Optional<Member> opActor = memberService.findByApiKey(apiKey);
-
-        if (opActor.isEmpty())
-            throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
-
-        return opActor.get();
-    }
 
     // 단건 조회
     @GetMapping("/{id}")
@@ -62,7 +49,7 @@ public class ApiV1PostController {
     public RsData<Void> deleteItem(
             @PathVariable long id
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -92,7 +79,7 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyBody reqBody
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -120,7 +107,7 @@ public class ApiV1PostController {
     public RsData<PostDto> writeItem(
             @RequestBody @Valid PostWriteBody reqBody
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
