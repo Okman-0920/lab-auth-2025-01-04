@@ -35,25 +35,25 @@ public class BaseInitData {
     public void work1() {
         if (memberService.count() > 0) return;
 
-        Member memberSystem = memberService.join("system", "1234system", "시스템");
+        Member memberSystem = memberService.join("system", "1234", "시스템");
         if (AppConfig.isNotProd()) memberSystem.setApiKey("system");
 
-        Member memberAdmin = memberService.join("admin", "1234admin", "관리자");
+        Member memberAdmin = memberService.join("admin", "1234", "관리자");
         if (AppConfig.isNotProd()) memberAdmin.setApiKey("admin");
 
-        Member memberUser1 = memberService.join("user1", "1234user1", "유저1");
+        Member memberUser1 = memberService.join("user1", "1234", "유저1");
         if (AppConfig.isNotProd()) memberUser1.setApiKey("user1");
 
-        Member memberUser2 = memberService.join("user2", "1234user2", "유저2");
+        Member memberUser2 = memberService.join("user2", "1234", "유저2");
         if (AppConfig.isNotProd()) memberUser2.setApiKey("user2");
 
-        Member memberUser3 = memberService.join("user3", "1234user3", "유저3");
+        Member memberUser3 = memberService.join("user3", "1234", "유저3");
         if (AppConfig.isNotProd()) memberUser3.setApiKey("user3");
 
-        Member memberUser4 = memberService.join("user4", "1234user4", "유저4");
+        Member memberUser4 = memberService.join("user4", "1234", "유저4");
         if (AppConfig.isNotProd()) memberUser4.setApiKey("user4");
 
-        Member memberUser5 = memberService.join("user5", "1234user5", "유저5");
+        Member memberUser5 = memberService.join("user5", "1234", "유저5");
         if (AppConfig.isNotProd()) memberUser5.setApiKey("user5");
     }
 
