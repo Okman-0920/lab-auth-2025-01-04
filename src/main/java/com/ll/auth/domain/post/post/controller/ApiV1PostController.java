@@ -23,6 +23,20 @@ public class ApiV1PostController {
     private final PostService postService;
     private final MemberService memberService;
 
+    public Member checkAuthentication(String credentials) {
+        String[] credentialsBits = credentials.split("/",2);
+        long actorId = Long.parseLong(credentialsBits[0]);
+        String actorPassword = credentialsBits[1];
+
+        Member actor = memberService.findById(actorId).get();
+
+        // 401 : 읽는 과정에서 인증 실패
+        if  (!actor.getPassword().equals(actorPassword))
+            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+
+        return actor;
+    }
+
     // 다건 조회
     @GetMapping
     public List<PostDto> getItems() {
@@ -48,15 +62,7 @@ public class ApiV1PostController {
             // URL 경로에서 id 값을 가져오는것
             @RequestHeader String credentials
     ) {
-        String[] credentialsBits = credentials.split("/",2);
-        long actorId = Long.parseLong(credentialsBits[0]);
-        String actorPassword = credentialsBits[1];
-
-        Member actor = memberService.findById(actorId).get();
-
-        // 401 : 읽는 과정에서 인증 실패
-        if  (!actor.getPassword().equals(actorPassword))
-            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+        Member actor = checkAuthentication(credentials);
 
         Post post = postService.findById(id).get();
 
@@ -87,15 +93,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostModifyBody reqBody,
             @RequestHeader String credentials
     ) {
-        String[] credentialsBits = credentials.split("/",2);
-        long actorId = Long.parseLong(credentialsBits[0]);
-        String actorPassword = credentialsBits[1];
-
-        Member actor = memberService.findById(actorId).get();
-
-        // 401 : 읽는 과정에서 인증 실패
-        if  (!actor.getPassword().equals(actorPassword))
-            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+        Member actor = checkAuthentication(credentials);
 
         Post post = postService.findById(id).get();
 
@@ -124,15 +122,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteBody reqBody,
             @RequestHeader String credentials
     ) {
-        String[] credentialsBits = credentials.split("/",2);
-        long actorId = Long.parseLong(credentialsBits[0]);
-        String actorPassword = credentialsBits[1];
-
-        Member actor = memberService.findById(actorId).get();
-
-        // 인증 체크
-        if (!actor.getPassword().equals(actorPassword))
-            throw new ServiceException("401-1" ,"비밀번호가 일치하지 않습니다.");
+        Member actor = checkAuthentication(credentials);
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
