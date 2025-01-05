@@ -21,10 +21,13 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class ApiV1PostController {
-    private final PostService postService;
-    private final MemberService memberService;
+    private final PostService postService; // in Singleton Bean
+    private final MemberService memberService; // in Singleton Bean
+    private final HttpServletRequest request; // in Singleton Bean
+    // @Controller 관련 어노테이션이 설정된 클래스에서 생성된 모든 인스턴스 대상
 
-    public Member checkAuthentication(String credentials) {
+    public Member checkAuthentication() {
+        String credentials = request.getHeader("Authorization");
         credentials = credentials.substring("Bearer ".length());
         String[] credentialsBits = credentials.split("/",2);
         long actorId = Long.parseLong(credentialsBits[0]);
@@ -60,11 +63,9 @@ public class ApiV1PostController {
     // 삭제
     @DeleteMapping("/{id}")
     public RsData<Void> deleteItem(
-            @PathVariable long id,
-            HttpServletRequest req
+            @PathVariable long id
     ) {
-        String credentials = req.getHeader("Authorization");
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -92,10 +93,9 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostDto> modifyItem(
             @PathVariable long id,
-            @RequestBody @Valid PostModifyBody reqBody,
-            @RequestHeader("Authorization") String credentials
+            @RequestBody @Valid PostModifyBody reqBody
     ) {
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -121,10 +121,9 @@ public class ApiV1PostController {
 
     @PostMapping
     public RsData<PostDto> writeItem(
-            @RequestBody @Valid PostWriteBody reqBody,
-            @RequestHeader("Authorization") String credentials
+            @RequestBody @Valid PostWriteBody reqBody
     ) {
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
