@@ -46,8 +46,14 @@ public class ApiV1MemberController {
     ) {
     }
 
+    record MemberJoinLoginResBody(
+            MemberDto item,
+            String apiKey
+    ) {
+    }
+
     @PostMapping("/login")
-    public RsData<String> login(
+    public RsData<MemberJoinLoginResBody> login(
             @RequestBody @Valid MemberJoinLoginReqBody reqBody
     ) {
         Member member = memberService.findByUsername(reqBody.username)
@@ -63,7 +69,10 @@ public class ApiV1MemberController {
         return new RsData<>(
                 "201-1",
                 "%s님 환영합니다.".formatted(member.getNickname()),
-                apikey
+                new MemberJoinLoginResBody(
+                        new MemberDto(member),
+                        apikey
+                )
         );
     }
 }
