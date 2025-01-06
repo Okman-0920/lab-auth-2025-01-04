@@ -21,6 +21,7 @@ public class ApiV1CommentController {
     // 댓글 조회
     @GetMapping
     public List<PostComment> getItems(
+            // 양방향 재귀로 인한 오류 발생
             @PathVariable long postId
     ) {
         Post post = postService.findById(postId).orElseThrow(
