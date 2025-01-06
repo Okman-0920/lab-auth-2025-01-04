@@ -18,7 +18,29 @@ import java.util.List;
 public class ApiV1CommentController {
     private final PostService postService;
 
-    // 댓글 조회
+    // 댓글 단건 조회
+    @GetMapping("{id}")
+    public PostCommentDto getItem(
+            @PathVariable long postId,
+            @PathVariable long id
+    ) {
+        Post post = postService.findById(postId).orElseThrow(
+                () -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId))
+        );
+
+        return post
+                .getComments()
+                .reversed()
+                .stream()
+                .filter(comment -> comment.getId() == id)
+                .map(comment -> new PostCommentDto(comment))
+                .findFirst()
+                .orElseThrow(
+                        () -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id))
+                );
+    }
+
+    // 댓글 다건 조회
     @GetMapping
     public List<PostCommentDto> getItems(
             // 양방향 재귀로 인한 오류 발생
@@ -37,4 +59,6 @@ public class ApiV1CommentController {
                 // .map(comment -> new PostCommentDto(comment))
                 .toList();
     }
+
+
 }
