@@ -8,6 +8,7 @@ import com.ll.auth.domain.post.post.service.PostService;
 import com.ll.auth.global.exceptions.ServiceException;
 import com.ll.auth.global.rq.Rq;
 import com.ll.auth.global.rsData.RsData;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts/{postId}/comments")
 public class ApiV1CommentController {
+    private final EntityManager em;
     private final PostService postService;
+
     private final Rq rq;
 
     // 댓글 다건 조회
@@ -84,6 +87,8 @@ public class ApiV1CommentController {
                 actor,
                 reqBody.content
         );
+
+        em.flush();
 
         return new RsData<>(
                 "201-1",
