@@ -12,8 +12,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts/{postId}/comments")
 public class ApiV1CommentController {
-    @Autowired
-    @Lazy
-    private ApiV1CommentController self;
     private final Rq rq;
 
     private final PostService postService;
@@ -68,40 +63,32 @@ public class ApiV1CommentController {
     }
 
     // 댓글 작성
-    public record PostCommentWriteBody (
+    public record PostCommentWriteReqBody (
             @NotBlank @Length (min = 2) String content
     ) {
     }
 
     // 댓글 작성
     @PostMapping
+    @Transactional
     public RsData<Void> writeItem(
             @PathVariable long postId,
-            @RequestBody @Valid PostCommentWriteBody reqBody
-    ) {
-        PostComment postComment = self._writeItem(postId, reqBody);
-
-        return new RsData<>(
-                "201-1",
-                "%d번 댓글이 작성되었습니다".formatted(postComment.getId())
-        );
-    }
-
-    // 댓글 작성
-    @Transactional
-    public PostComment _writeItem(
-            long postId,
-            PostCommentWriteBody reqBody
+            @RequestBody @Valid PostCommentWriteReqBody reqBody
     ) {
         Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(postId).orElseThrow(
-                () -> new ServiceException("401-1", "%d번 글은 존재하지 않습니다".formatted(postId))
+                () -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId))
         );
 
-        return post.addComment(
+        PostComment postComment = post.addComment(
                 actor,
                 reqBody.content
+        );
+
+        return new RsData<>(
+                "201-1",
+                "%d번 댓글이 작성되었습니다.".formatted(postComment.getId())
         );
     }
 }
