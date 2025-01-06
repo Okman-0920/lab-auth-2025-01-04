@@ -9,7 +9,6 @@ import lombok.Getter;
 // null인 필드는 JSON에 포함되지 않음
 @AllArgsConstructor
 @Getter
-
 // 응답 양식 통일하려고 만든 클래스
 public class RsData<T> { // <T> 는 어떤 타입이든 사용 가능하다
     private String resultCode;
