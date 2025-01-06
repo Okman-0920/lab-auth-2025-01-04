@@ -21,9 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts/{postId}/comments")
 public class ApiV1CommentController {
-    private final Rq rq;
-
     private final PostService postService;
+    private final Rq rq;
 
     // 댓글 다건 조회
     @GetMapping
@@ -63,7 +62,7 @@ public class ApiV1CommentController {
     }
 
     // 댓글 작성
-    public record PostCommentWriteReqBody (
+    public record PostCommentWriteBody (
             @NotBlank @Length (min = 2) String content
     ) {
     }
@@ -71,24 +70,24 @@ public class ApiV1CommentController {
     // 댓글 작성
     @PostMapping
     @Transactional
-    public RsData<Void> writeItem(
+    public RsData<Void> writeComment(
             @PathVariable long postId,
-            @RequestBody @Valid PostCommentWriteReqBody reqBody
+            @RequestBody @Valid PostCommentWriteBody reqBody
     ) {
         Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(postId).orElseThrow(
-                () -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId))
+                () -> new ServiceException("401-1", "%d번 글은 존재하지 않습니다".formatted(postId))
         );
 
-        PostComment postComment = post.addComment(
+        PostComment postcomment = post.addComment(
                 actor,
                 reqBody.content
         );
 
         return new RsData<>(
                 "201-1",
-                "%d번 댓글이 작성되었습니다.".formatted(postComment.getId())
+                "%d번 댓글이 작성되었습니다".formatted(postcomment.getId())
         );
     }
 }
