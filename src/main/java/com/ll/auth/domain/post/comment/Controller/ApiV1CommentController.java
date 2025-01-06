@@ -148,7 +148,7 @@ public class ApiV1CommentController {
         );
 
         if (!actor.isAdmin() && !postcomment.getAuthor().equals(actor))
-            throw new ServiceException("403-1", "작성자만 삭제할 수 있습니다.");
+            throw new ServiceException("403-1", "작성자만 댓글을 삭제할 수 있습니다.");
 
         post.removeComment(postcomment);
 

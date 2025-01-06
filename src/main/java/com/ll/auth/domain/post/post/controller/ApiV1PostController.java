@@ -5,7 +5,6 @@ import com.ll.auth.domain.member.member.service.MemberService;
 import com.ll.auth.domain.post.post.dto.PostDto;
 import com.ll.auth.domain.post.post.entity.Post;
 import com.ll.auth.domain.post.post.service.PostService;
-import com.ll.auth.global.exceptions.ServiceException;
 import com.ll.auth.global.rq.Rq;
 import com.ll.auth.global.rsData.RsData;
 import jakarta.validation.Valid;
@@ -53,9 +52,7 @@ public class ApiV1PostController {
 
         Post post = postService.findById(id).get();
 
-        // 403 : 권한 부여의 실패
-        if  (!actor.isAdmin() && !post.getAuthor().equals(actor))
-            throw new ServiceException("403-1" ,"작성자만 글을 삭제할 권한이 있습니다.");
+        post.checkActorCanDelete(actor);
 
         postService.delete(post);
 
@@ -83,9 +80,7 @@ public class ApiV1PostController {
 
         Post post = postService.findById(id).get();
 
-        // 403 : 권한 부여의 실패
-        if  (!post.getAuthor().equals(actor))
-            throw new ServiceException("403-1" ,"작성자만 글을 수정할 권한이 있습니다.");
+        post.checkActorCanModify(actor);
 
         postService.modify(post, reqBody.title, reqBody.content);
 
