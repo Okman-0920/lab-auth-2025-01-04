@@ -1,6 +1,5 @@
 package com.ll.auth.domain.post.post.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ll.auth.domain.post.post.entity.Post;
 import lombok.Getter;
 
@@ -14,10 +13,8 @@ import java.time.LocalDateTime;
 public class PostDto {
     private long id;
 
-    @JsonProperty("createdDatetime")
     private LocalDateTime createDate;
 
-    @JsonProperty("modifiedDatetime")
     private LocalDateTime modifyDate;
 
     private long authorId;
