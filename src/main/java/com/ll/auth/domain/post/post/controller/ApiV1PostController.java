@@ -54,7 +54,7 @@ public class ApiV1PostController {
         Post post = postService.findById(id).get();
 
         // 403 : 권한 부여의 실패
-        if  (!post.getAuthor().equals(actor))
+        if  (!actor.isAdmin() && !post.getAuthor().equals(actor))
             throw new ServiceException("403-1" ,"작성자만 글을 삭제할 권한이 있습니다.");
 
         postService.delete(post);

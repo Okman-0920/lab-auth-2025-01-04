@@ -120,13 +120,41 @@ public class ApiV1CommentController {
         );
 
         if (!postcomment.getAuthor().equals(actor))
-            throw new ServiceException("403-1", "글 작성자만 수정할 수 있습니다.");
+            throw new ServiceException("403-1", "작성자만 수정할 수 있습니다.");
 
         postcomment.modify(reqBody.content);
 
         return new RsData<>(
                 "201-1",
                 "%d번 댓글이 수정되었습니다".formatted(postcomment.getId())
+        );
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/{id}")
+    @Transactional
+    public RsData<Void> deleteComment(
+            @PathVariable long postId,
+            @PathVariable long id
+    ) {
+        Member actor = rq.checkAuthentication();
+
+        Post post = postService.findById(postId).orElseThrow(
+                () -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다".formatted(postId))
+        );
+
+        PostComment postcomment = post.getCommentById(id).orElseThrow(
+                () -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다".formatted(id))
+        );
+
+        if (!actor.isAdmin() && !postcomment.getAuthor().equals(actor))
+            throw new ServiceException("403-1", "작성자만 삭제할 수 있습니다.");
+
+        post.removeComment(postcomment);
+
+        return new RsData<>(
+                "201-1",
+                "%d번 댓글이 삭제되었습니다".formatted(id)
         );
     }
 }
